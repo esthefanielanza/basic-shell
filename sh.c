@@ -8,9 +8,8 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 
-/* MARK NAME Seu Nome Aqui */
-/* MARK NAME Nome de Outro Integrante Aqui */
-/* MARK NAME E Etc */
+/* MARK NAME EsthefanieLanza */
+/* MARK NAME Gabriel Cardoso */
 
 /****************************************************************
  * Shell xv6 simplificado
@@ -71,12 +70,14 @@ runcmd(struct cmd *cmd)
 
   case ' ':
     ecmd = (struct execcmd*)cmd;
-    if(ecmd->argv[0] == 0)
-      exit(0);
+    if(ecmd->argv[0] == 0) exit(0);
     /* MARK START task2
      * TAREFA2: Implemente codigo abaixo para executar
      * comandos simples. */
-    fprintf(stderr, "exec nao implementado\n");
+    if(execvp(ecmd->argv[0], ecmd->argv) == -1) {
+      fprintf(stderr, "%s: comando não encontrado\n", ecmd->argv[0]);
+    }
+    execvp(ecmd->argv[0], ecmd->argv);
     /* MARK END task2 */
     break;
 
