@@ -128,10 +128,11 @@ main(void)
     /* TAREFA1: O que faz o if abaixo e por que ele é necessário?
      * Insira sua resposta no código e modifique o fprintf abaixo
      * para reportar o erro corretamente. */
-    if(buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' '){
+    // O comando cd não é suportado pelo execv. Isso ocorre porque o exec inicia um processo filho e não pode mudar o cwd ( current working directory ) do seu pai ( shell ). 
+	if(buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' '){
       buf[strlen(buf)-1] = 0;
       if(chdir(buf+3) < 0)
-        fprintf(stderr, "reporte erro\n");
+        fprintf(stderr, "Não é possível mudar o CWD do shell pai.\n");
       continue;
     }
     /* MARK END task1 */
