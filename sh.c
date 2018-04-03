@@ -76,8 +76,9 @@ runcmd(struct cmd *cmd)
      * comandos simples. */
     if(execvp(ecmd->argv[0], ecmd->argv) == -1) {
       fprintf(stderr, "%s: comando não encontrado\n", ecmd->argv[0]);
+      exit(1);
     }
-    execvp(ecmd->argv[0], ecmd->argv);
+    else execvp(ecmd->argv[0], ecmd->argv);
     /* MARK END task2 */
     break;
 
@@ -88,8 +89,8 @@ runcmd(struct cmd *cmd)
      * TAREFA3: Implemente codigo abaixo para executar
      * comando com redirecionamento. */
     int file = open(rcmd->file, rcmd->mode);
-	close(1);
-	file = dup2(file, rcmd->fd);	
+  	close(rcmd->fd);
+	  file = dup2(file, rcmd->fd);	
     /* MARK END task3 */
     runcmd(rcmd->cmd);
     break;
