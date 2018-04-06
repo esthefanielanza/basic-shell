@@ -76,7 +76,7 @@ runcmd(struct cmd *cmd)
      * comandos simples. */
     if(execvp(ecmd->argv[0], ecmd->argv) == -1) {
       fprintf(stderr, "%s: comando não encontrado\n", ecmd->argv[0]);
-      exit(1);
+      exit(-1);
     }
     else execvp(ecmd->argv[0], ecmd->argv);
     /* MARK END task2 */
@@ -100,7 +100,23 @@ runcmd(struct cmd *cmd)
     /* MARK START task4
      * TAREFA4: Implemente codigo abaixo para executar
      * comando com pipes. */
-    fprintf(stderr, "pipe nao implementado\n");
+    pipe(p);
+    int pid = fork();
+    r = 0;
+    if(pid == 0) {// filho - lado esquerdo do pipe
+      runcmd(pcmd->left);
+      dup2(p[1], STDOUT_FILENO);
+      fprintf(stderr, "closing files\n");
+      exit(0);
+    } else { // pai - lado direito do pipe
+      while(wait(&r) > 0){
+        fprintf(stderr, "alo");
+      };
+      dup2(p[0], STDIN_FILENO);
+      runcmd(pcmd->right);
+      fprintf(stderr, "what is love\n");
+      exit(0);
+    }
     /* MARK END task4 */
     break;
   }    
