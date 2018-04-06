@@ -8,7 +8,7 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 
-/* MARK NAME EsthefanieLanza */
+/* MARK NAME Esthefanie Lanza */
 /* MARK NAME Gabriel Cardoso */
 
 /****************************************************************
@@ -101,21 +101,28 @@ runcmd(struct cmd *cmd)
      * TAREFA4: Implemente codigo abaixo para executar
      * comando com pipes. */
     pipe(p);
-    int pid = fork();
-    r = 0;
-    if(pid == 0) {// filho - lado esquerdo do pipe
-      runcmd(pcmd->left);
+    r = fork();
+
+    if(r == 0) {
+      // Processo filho - lado esquerdo do pipe
       dup2(p[1], STDOUT_FILENO);
-      fprintf(stderr, "closing files\n");
-      exit(0);
-    } else { // pai - lado direito do pipe
-      while(wait(&r) > 0){
-        fprintf(stderr, "alo");
-      };
+
+      close(p[0]);
+      close(p[1]);
+
+      runcmd(pcmd->left);
+      exit(1);
+    } else {
+      // Processo pai - lado direito do pipe
       dup2(p[0], STDIN_FILENO);
+      close(p[0]);
+      close(p[1]);
+      
+	  // Esperando filho
+      wait(NULL);
+
       runcmd(pcmd->right);
-      fprintf(stderr, "what is love\n");
-      exit(0);
+      exit(1);
     }
     /* MARK END task4 */
     break;
