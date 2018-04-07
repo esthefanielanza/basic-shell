@@ -6,6 +6,7 @@
 #include <pwd.h>
 #include <unistd.h>
 #include <signal.h>
+#include <pthread.h>
 
 #define clear() printf("\033[H\033[J")
 
@@ -23,7 +24,7 @@ int readSignal(pid_t *pid, int *action) {
   return 0;
 }
 
-void handleSignal() {
+void * handleSignal() {
   int action;
   pid_t pid;
 
@@ -86,16 +87,22 @@ void printTopProcess(int top){
   }
 }
 
-void top(){
+void * top(){
+  int n_refresh = 0;
   while(1){
     clear();
+    printf("Numero de refreshs: %d\n", n_refresh);
     printTopProcess(30);
     sleep(1);
   }
 }
 
 int main(){
-
+  pthread_t a, b;
+  pthread_create(&a, NULL, top, NULL);
+  pthread_create(&b, NULL, handleSignal, NULL);
+  pthread_join(a, NULL);
+  pthread_join(b, NULL);
   return 0;
 }
 
