@@ -5,13 +5,37 @@
 #include <string.h>
 #include <pwd.h>
 #include <unistd.h>
+#include <signal.h>
 
 #define clear() printf("\033[H\033[J")
 
-struct process{
-  char p_name[20], p_state[20], char_trash[500];
-  int p_uid;
+int readSignal(pid_t *pid, int *action) {
+  fprintf(stdout, "> ");
+  if(scanf("%d", pid) != 1) {
+    fprintf(stdout, "Invalid pid\n");
+    return 1;
+  } else {
+    if(scanf("%d", action) != 1) {
+      fprintf(stdout, "Invalid signal action\n");
+      return 1;
+    }
+  }
+  return 0;
 }
+
+void handleSignal() {
+  int action;
+  pid_t pid;
+
+  while(readSignal(&pid, &action) == 0) {
+    if(kill(pid, action) == 0) {
+      printf("Signal sent! :)\n");
+    } else {
+      printf("Signal not sent :(\n");
+    }
+	};
+}
+
 
 void printTopProcess(int top){
   printf("PID  | User     | PROCNAME      | Estado |\n");
@@ -54,6 +78,7 @@ void printTopProcess(int top){
       }
     }
     closedir(dir);
+    handleSignal();
   }
   else{
     printf("Error opening directory\n");
