@@ -10,18 +10,23 @@
 
 #define clear() printf("\033[H\033[J")
 
+pthread_mutex_t mutex;
+
 int readSignal(pid_t *pid, int *action) {
-  fprintf(stdout, "> ");
+  int error = 0;
+  pthread_mutex_lock(&mutex);
+  printf("\n\n> ");
+  pthread_mutex_unlock(&mutex);
   if(scanf("%d", pid) != 1) {
-    fprintf(stdout, "Invalid pid\n");
-    return 1;
+    printf("Invalid pid\n");
+    error = 1;
   } else {
     if(scanf("%d", action) != 1) {
-      fprintf(stdout, "Invalid signal action\n");
-      return 1;
+      printf("Invalid signal action\n");
+      error = 1;
     }
   }
-  return 0;
+  return error;
 }
 
 void * handleSignal() {
@@ -30,9 +35,9 @@ void * handleSignal() {
 
   while(readSignal(&pid, &action) == 0) {
     if(kill(pid, action) == 0) {
-      printf("Signal sent! :)\n");
+      printf("Signal sent to pid: %d\n", pid);
     } else {
-      printf("Signal not sent :(\n");
+      printf("Error: signal was not sent.\n");
     }
 	};
 }
@@ -79,7 +84,6 @@ void printTopProcess(int top){
       }
     }
     closedir(dir);
-    handleSignal();
   }
   else{
     printf("Error opening directory\n");
@@ -90,15 +94,19 @@ void printTopProcess(int top){
 void * top(){
   int n_refresh = 0;
   while(1){
+    pthread_mutex_lock(&mutex);
     clear();
     printf("Numero de refreshs: %d\n", n_refresh);
     printTopProcess(30);
-    sleep(1);
+    n_refresh++;
+    pthread_mutex_unlock(&mutex);
+    sleep(5);
   }
 }
 
 int main(){
   pthread_t a, b;
+  pthread_mutex_init(&mutex, NULL);
   pthread_create(&a, NULL, top, NULL);
   pthread_create(&b, NULL, handleSignal, NULL);
   pthread_join(a, NULL);
